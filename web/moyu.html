@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="jquery/jquery.min.js" charset="utf-8"></script>
+    <script src="plug-in/pako.js" charset="utf-8"></script>
+    <script src="simpleDanmu.js" charset="utf-8"></script>
+    <title>在线文档编辑器</title>
+    <style type="text/css">
+        body{
+            overflow:hidden;
+            margin:0;
+        }
+        .control_preview,
+        .danmu_msg{
+            display: block;
+        }
+        .control_preview{
+            height: 50px;
+            overflow:hidden;
+        }
+        #player{
+            float: right;
+            border: 0;
+            height: 100%;
+            width: 100%;
+        }
+        .danmu_msg{
+            height: calc(100vh - 50px);
+            overflow-x: hidden;
+            overflow-y: scroll;
+            scroll-behavior:smooth;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        var url_get = window.location.href;
+        $(document).ready(function(){
+            $('#player')[0].src = `playerWithoutDanmu.html?room=${url_get.split('?')[1].split('&')[0].split('=')[1]}`;
+            wsss(url_get.split('?')[1].split('&')[0].split('=')[1]);
+        })
+        document.addEventListener("keydown",keydown);
+        function keydown(event){
+            if(event.keyCode == 81){
+                window.close();
+            }
+        }
+        function ptxx(name,text){
+            $('.danmu_msg')[0].innerHTML += `<p>${text}</p>`;
+            $('.danmu_msg').get(0).scroll(0, $('.danmu_msg').get(0).scrollHeight);
+        }
+        function jrzb(name){
+            return false;
+        }
+    </script>
+    <div class="control_preview">
+        <iframe id="player" src="#"></iframe>
+    </div>
+    <div class="danmu_msg">
+        
+    </div>
+</body>
+</html>

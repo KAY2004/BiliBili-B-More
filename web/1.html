@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="jquery/jquery.min.js" charset="utf-8"></script>
+    <script src="plug-in/pako.js" charset="utf-8"></script>
+    <script src="simpleDanmu.js" charset="utf-8"></script>
+    <title>单推-监控室</title>
+    <style type="text/css">
+        body {
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .player {
+            border: 0;
+            position: fixed;
+            box-sizing: border-box;
+            width: calc(100vw - 190px);
+            height: 100vh;
+            top: 0;
+            left: 0;
+        }
+
+        .danmu_list {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 190px;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+            line-break: break-all;
+            box-sizing: border-box;
+            padding: 5px;
+        }
+
+        #fullScreen {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            top: 5px;
+            right: 5px;
+            z-index: 99;
+            cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript">
+        var url_get = window.location.href;
+        $(document).ready(function () {
+            $('#player0')[0].src = `player.html?room=${url_get.split('?')[1].split('&')[0].split('=')[1]}`;
+            wsss(url_get.split('?')[1].split('&')[0].split('=')[1]);
+        });
+        function ptxx(name, text) {
+            $('.danmu_list')[0].innerHTML += `<p>${text}</p>`;
+            $('.danmu_list').get(0).scroll(0, $('.danmu_list').get(0).scrollHeight);
+        }
+        function jrzb(name) {
+            return false;
+        }
+        function launchFullscreen(element) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <img id="fullScreen" onclick="launchFullscreen(document.documentElement)" src="icon/fullScreen.png" />
+    <iframe class="player" id="player0">
+        <p>出错！您的浏览器版本过旧，请升级后重试</p>
+    </iframe>
+    <div class="danmu_list"></div>
+</body>
+
+</html>

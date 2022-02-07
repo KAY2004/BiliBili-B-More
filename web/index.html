@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="jquery/jquery.min.js" charset="utf-8"></script>
+    <meta name="description" content="B站直播 多开监视器">
+    <!-- <link rel="icon" href="favicon.ico"> -->
+    <title>B站 直播弹幕监控室</title>
+    <style type="text/css">
+        body {
+            overflow: hidden;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .picSelect {
+            width: 12%;
+            height: auto;
+            transition: all 0.25s ease-in-out;
+            border-radius: 10%;
+        }
+
+        .picSelect:hover {
+            box-shadow: 0 0 10px #585858;
+            transform: scale3d(1.1, 1.1, 1.1);
+        }
+
+        #blackfilter {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 100vw;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 99;
+        }
+
+        .popStyle {
+            background-color: white;
+            height: 400px;
+            max-width: 600px;
+            width: 90%;
+            border-radius: 16px;
+            box-shadow: 0 0 10px #585858;
+            box-sizing: border-box;
+            padding: 30px;
+            text-align: center;
+            display: none;
+            position: relative;
+        }
+
+        .left input {
+            max-width: 192px;
+            width: 90%;
+        }
+
+        .left,
+        .right {
+            height: 100%;
+            width: 50%;
+            overflow-y: scroll;
+            box-sizing: border-box;
+        }
+
+        #zhubo {
+            width: 100%;
+        }
+
+        .rn {
+            cursor: grab;
+            border-bottom: 1px;
+            border-bottom-color: lightgrey;
+            border-bottom-style: solid;
+            display: block;
+        }
+
+        name {
+            color: black;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        number {
+            color: grey;
+        }
+
+        .up_new {
+            display: block;
+            height: 50px;
+            box-sizing: border-box;
+            padding: 5px;
+            text-align: left;
+            padding-left: 10%;
+            padding-right: 10%;
+            border-bottom-width: 1px;
+            border-bottom-color: lightgrey;
+            border-bottom-style: solid;
+            cursor: pointer;
+            transition: all 0.25s ease-in-out;
+        }
+
+        .up_new:hover {
+            background-color: #E6E6E6;
+        }
+
+        .up_new uname {
+            vertical-align: top;
+            margin-left: 15px;
+        }
+
+        .up_new des {
+            font-size: 65%;
+            margin-left: 15px;
+            margin-top: 3px;
+            vertical-align: top;
+            white-space: nowrap;
+            display: inline-block;
+            width: calc(100% - 65px);
+            overflow: hidden;
+        }
+
+        .up_new img {
+            height: 40px;
+            width: 40px;
+            border-radius: 20px;
+            float: left;
+        }
+
+        #main_new_outer {
+            overflow-y: display;
+            overflow-x: display;
+            position: relative;
+        }
+
+        #main_new {
+            overflow-y: scroll;
+            height: calc(100% - 25px);
+        }
+
+        #up_search {
+            width: 90%;
+            height: 24px;
+            box-sizing: border-box;
+        }
+
+        .position_back {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .position_back:hover {
+            transform: scale3d(1.1, 1.1, 1.1);
+        }
+    </style>
+    <script>
+        var select;
+        function cont(e) {
+            select = e;
+            if (e == -1) {
+                e = 1;
+            }
+            for (let ab = 0; ab <= 8; ab++) {
+                document.getElementsByTagName('input')[ab].disabled = false;
+            }
+            show();
+            for (let i = e; i <= 8; i++) {
+                document.getElementsByTagName('input')[i].disabled = true;
+            }
+        }
+        function show() {
+            document.getElementById('blackfilter').style.display = "flex";
+            document.getElementById('main_select').style.display = "flex";
+        }
+        function hide_mainsel() {
+            document.getElementById('main_select').style.display = "none";
+        }
+        function start() {
+            var val = document.getElementsByTagName('input');
+            if (select != -1) {
+                var link = select + ".html?";
+                for (let i = 1; i <= select; i++) {
+                    if (i == 1) {
+                        link += "room" + i + "=" + val[i - 1].value;
+                    } else {
+                        link += "&room" + i + "=" + val[i - 1].value;
+                    }
+                }
+                window.open(link);
+            } else {
+                window.open(`moyu.html?room=${val[0].value}`, "newWindow", `menubar=0,scrollbars=1,height=${document.documentElement.clientHeight},width=89,resizable=1,status=0,titlebar=0,toolbar=0,location=0`);
+            }
+            back_pri();
+        }
+    </script>
+</head>
+
+<body>
+    <img onclick="cont(-1)" id="num2" class="picSelect" src="sample/fish.png">
+    <img onclick="cont(2)" id="num2" class="picSelect" src="sample/2.png">
+    <img onclick="cont(4)" id="num4" class="picSelect" src="sample/4.png">
+    <img onclick="cont(6)" id="num6" class="picSelect" src="sample/6.png">
+    <img onclick="cont(9)" id="num9" class="picSelect" src="sample/9.png">
+    <div id="blackfilter">
+        <div class="popStyle" id="main_select">
+            <img class="position_back" onclick="back_pri()" src="icon/goBack.png" />
+            <div class="left">
+                <br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 1"
+                    type="number" id="input1"><br><br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 2"
+                    type="number" id="input2"><br><br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 3"
+                    type="number" id="input3"><br><br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 4"
+                    type="number" id="input4"><br><br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 5"
+                    type="number" id="input5"><br><br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 6"
+                    type="number" id="input6"><br><br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 7"
+                    type="number" id="input7"><br><br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 8"
+                    type="number" id="input8"><br><br>
+                <input ondrop="drop(event)" ondragover="allowDrop(event)" class="kuang" placeholder="房间号 9"
+                    type="number" id="input9"><br><br>
+                <button onclick="start()">开始</button>
+                <br><br>
+            </div>
+            <div id="right" class="right">
+                <div id="zhubo"></div>
+                <br>
+                <button onclick="autoAdd()">🔍添加</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button onclick="tishi()" ondrop="del(event)" ondragover="allowDrop(event)">删除</button>
+            </div>
+        </div>
+        <div class="popStyle" id="main_new_outer">
+            <img class="position_back" onclick="back()" src="icon/goBack.png" />
+            <input id="up_search" type="text" placeholder="搜索主播">
+            <div id="main_new"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("keydown", keydown);
+        function keydown(event) {
+            if (event.keyCode == 192) {
+                cont(1);
+            }
+        }
+        var curnow;
+        var curnowd;
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+        function drag(ev) {
+            curnow = ev.target.children[2].innerHTML;
+            curnowd = parseInt(ev.target.getAttribute("data-id"));
+            //curnow += `|${ev.target.children[0].innerHTML}`;
+        }
+        function drop(ev) {
+            ev.preventDefault();
+            ev.target.value = curnow;
+        }
+        function del(ev) {
+            ev.preventDefault();
+            let arr = JSON.parse(localStorage.getItem("zhubo"));
+            arr.splice(curnowd, 1);
+            localStorage.setItem('zhubo', JSON.stringify(arr));
+            document.getElementById('zhubo').innerHTML = "";
+            for (let p = 0; p <= arr.length - 1; p++) {
+                document.getElementById('zhubo').innerHTML +=
+                    `<span draggable="true" ondragstart="drag(event)" class="rn" data-id="${p}">
+                        <name>${arr[p].uname}</name><br>
+                        <number>${arr[p].room_id}</number>
+                </span>`;
+            }
+        }
+        //var ou = false;
+        $(document).ready(function () {
+            $("#up_search").change(function (e) {
+                document.getElementById('main_new').innerHTML = "";
+                $.get('https://api.bilibili.com/x/web-interface/search/type',
+                    {
+                        search_type: "bili_user",
+                        page: 1,
+                        keyword: e.target.value,
+                        changing: "mid",
+                        __refresh__: true,
+                        highlight: 1,
+                        single_column: 0
+                    },
+                    (data) => {
+                        try {
+                            if (data.data.result) {
+                                //ou = data;
+                                for (let i = 0; i <= data.data.result.length - 1; i++) {
+                                    if (data.data.result[i].room_id != 0) {
+                                        document.getElementById('main_new').innerHTML += `
+                                            <div class="up_new" data-id="${i}">
+                                                <img data-id="${i}" src="https:${data.data.result[i].upic}">
+                                                <uname data-id="${i}">${data.data.result[i].uname}</uname><br>
+                                                <des data-id="${i}">${data.data.result[i].usign}</des>
+                                            </div>`;
+                                    }
+                                }
+                                IChoose(data);
+                            }
+                        } catch (e) {
+                            console.warn('忽略请求错误');
+                        }
+                    }
+                );
+            });
+        });
+        function autoAdd() {
+            $('#up_search').val('');
+            hide_mainsel();
+            document.getElementById('main_new').innerHTML = "";
+            document.getElementById('main_new_outer').style.display = "block";
+        }
+        function IChoose(ou) {
+            $('.up_new').one('click', function (e) {
+                $('#up_search').val('');
+                var xuhao = parseInt(e.target.getAttribute('data-id'));
+                if (localStorage.zhubo) {
+                    let json = JSON.parse(localStorage.getItem("zhubo"));
+                    for (let i = 0; i <= json.length - 1; i++) {
+                        if (ou.data.result[xuhao].room_id == json[i].room_id) {
+                            alert('您已经添加过' + json[i].uname + '了');
+                            return false;
+                        }
+                    }
+                    let pn = document.getElementsByClassName('rn').length;
+                    json.push(ou.data.result[xuhao]);
+                    localStorage.setItem('zhubo', JSON.stringify(json));
+                    document.getElementById('main_new_outer').style.display = "none";
+                    document.getElementById('zhubo').innerHTML +=
+                        `<span draggable="true" ondragstart="drag(event)" class="rn" data-id="${pn}">
+                            <name>${ou.data.result[xuhao].uname}</name><br>
+                            <number>${ou.data.result[xuhao].room_id}</number>
+                    </span>`;
+                    putLatLiveStatue(ou.data.result[xuhao].mid);
+                    show();
+                } else {
+                    let json = [ou.data.result[xuhao]];
+                    localStorage.setItem('zhubo', JSON.stringify(json));
+                    document.getElementById('main_new_outer').style.display = "none";
+                    document.getElementById('zhubo').innerHTML +=
+                        `<span draggable="true" ondragstart="drag(event)" class="rn" data-id="0">
+                            <name>${ou.data.result[xuhao].uname}</name><br>
+                            <number>${ou.data.result[xuhao].room_id}</number>
+                    </span>`;
+                    putLatLiveStatue(ou.data.result[xuhao].mid);
+                    show();
+                }
+            });
+        }
+        function back() {
+            $('#up_search').val('');
+            document.getElementById('main_new_outer').style.display = "none";
+            show();
+        }
+        function back_pri() {
+            document.getElementById('blackfilter').style.display = "none";
+        }
+        function tishi() {
+            alert('拖到这里来删除');
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            if (localStorage.zhubo) {
+                let arr = JSON.parse(localStorage.getItem("zhubo"));
+                let curnof = arr.length - 1;
+                for (let p = 0; p <= arr.length - 1; p++) {
+                    document.getElementById('zhubo').innerHTML +=
+                        `<span draggable="true" ondragstart="drag(event)" class="rn" data-id="${p}">
+                            <name>${arr[p].uname}</name><br>
+                            <number>${arr[p].room_id}</number>
+                    </span>`;
+                }
+                getStatus(curnof, arr);
+            }
+        });
+        var getLive;
+        var liveCount = 0;
+        //getUpInfo.php
+        function getStatus(muchId, sj) {
+            getLive = setInterval(function () {
+                $.get('https://api.bilibili.com/x/space/acc/info', {
+                    mid: sj[liveCount].mid,
+                    jsonp: 'jsonp'
+                }, function (result) {
+                    if (result.data.live_room) {
+                        if (result.data.live_room.liveStatus == 1) {
+                            document.getElementsByClassName('rn')[liveCount - 1].innerHTML += `<span style="color:green">直播中</span>`;
+                        } else {
+                            document.getElementsByClassName('rn')[liveCount - 1].innerHTML += `<span style="color:red">未开播</span>`;
+                        }
+                    } else {
+                        document.getElementsByClassName('rn')[liveCount - 1].innerHTML += `<span style="color:#0000FF">系统堵塞</span>`;
+                    }
+                });
+                liveCount += 1;
+                if (liveCount == muchId + 1) {
+                    stopGetLive();
+                }
+            }, 800);
+        }
+        function stopGetLive() {
+            clearInterval(getLive);
+        }
+        function putLatLiveStatue(mid) {
+            let hown = document.getElementsByClassName('rn').length - 1;
+            $.get('https://api.bilibili.com/x/space/acc/info', { 
+                mid: mid,
+                jsonp: 'jsonp'
+            }, function (result) {
+                if (result.data.live_room) {
+                    if (result.data.live_room.liveStatus == 1) {
+                        document.getElementsByClassName('rn')[hown].innerHTML += `<span style="color:green">直播中</span>`;
+                    } else {
+                        document.getElementsByClassName('rn')[hown].innerHTML += `<span style="color:red">未开播</span>`;
+                    }
+                } else {
+                    document.getElementsByClassName('rn')[hown].innerHTML += `<span style="color:#0000FF">系统堵塞</span>`;
+                }
+            });
+        }
+        //整活
+        // window.onload = function(){
+        //     console.log('%c陈杨得雪 YYDS！！！', 'color:red; font-size: 90px; font-weight: 500');
+        // }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="jquery/jquery.min.js" charset="utf-8"></script>
+    <title>四开-监控室</title>
+    <style type="text/css">
+        body {
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .player {
+            border: 0;
+            position: fixed;
+            box-sizing: border-box;
+            width: 50vw;
+            height: 50vh;
+            top: 0;
+        }
+
+        #player0 {
+            left: 0;
+        }
+
+        #player1 {
+            right: 0;
+        }
+
+        #player2 {
+            top: 50vh;
+            left: 0;
+        }
+
+        #player3 {
+            top: 50vh;
+            right: 0;
+        }
+    </style>
+    <script type="text/javascript">
+        var url_get = window.location.href;
+        $(document).ready(function () {
+            $('#player0')[0].src = `player.html?room=${url_get.split('?')[1].split('&')[0].split('=')[1]}`;
+            $('#player1')[0].src = `player.html?room=${url_get.split('?')[1].split('&')[1].split('=')[1]}`;
+            $('#player2')[0].src = `player.html?room=${url_get.split('?')[1].split('&')[2].split('=')[1]}`;
+            $('#player3')[0].src = `player.html?room=${url_get.split('?')[1].split('&')[3].split('=')[1]}`;
+        });
+    </script>
+</head>
+
+<body>
+    <iframe class="player" id="player0">
+        <p>出错！您的浏览器版本过旧，请升级后重试</p>
+    </iframe>
+    <iframe class="player" id="player1">
+        <p>出错！您的浏览器版本过旧，请升级后重试</p>
+    </iframe>
+    <iframe class="player" id="player2">
+        <p>出错！您的浏览器版本过旧，请升级后重试</p>
+    </iframe>
+    <iframe class="player" id="player3">
+        <p>出错！您的浏览器版本过旧，请升级后重试</p>
+    </iframe>
+</body>
+
+</html>
